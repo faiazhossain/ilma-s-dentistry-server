@@ -25,13 +25,16 @@ async function run() {
       .db("ilmasDentistry")
       .collection("services");
 
+    // reviews collection
     const reviewCollection = client.db("ilmasDentistry").collection("reviews");
+
     app.get("/allServices", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
       res.send(services);
     });
+
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query).limit(3);
@@ -46,11 +49,18 @@ async function run() {
       res.send(service);
     });
 
-    // create reviews
+    // get Reviews
+    app.get("/reviews", async (req, res) => {
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
 
+    // reviews api
     app.post("/reviews", async (req, res) => {
       const review = req.body;
-      const result = reviewCollection.insertOne(review);
+      const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
   } finally {
