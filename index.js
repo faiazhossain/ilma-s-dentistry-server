@@ -27,6 +27,9 @@ async function run() {
 
     // reviews collection
     const reviewCollection = client.db("ilmasDentistry").collection("reviews");
+    const MyReviewCollection = client
+      .db("ilmasDentistry")
+      .collection("myReviews");
 
     app.get("/allServices", async (req, res) => {
       const query = {};
@@ -49,12 +52,25 @@ async function run() {
       res.send(service);
     });
 
+    app.get("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const reviews = await reviewCollection.findOne(query);
+      res.send(reviews);
+    });
+
     // get Reviews
+
     app.get("/reviews", async (req, res) => {
       let query = {};
       if (req.query.service) {
         query = {
           service: req.query.service,
+        };
+      }
+      if (req.query.userEmail) {
+        query = {
+          userEmail: req.query.userEmail,
         };
       }
       const cursor = reviewCollection.find(query);
@@ -66,6 +82,34 @@ async function run() {
     app.post("/reviews", async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+    // my reviews
+    // get Reviews
+    app.get("/myreviews", async (req, res) => {
+      let query = {};
+      if (req.query.userEmail) {
+        query = {
+          userEmail: req.query.userEmail,
+        };
+      }
+      const cursor = MyReviewCollection.find(query);
+      const myReviews = await cursor.toArray();
+      res.send(myReviews);
+    });
+
+    // reviews api
+    app.post("/myreviews", async (req, res) => {
+      const myReviews = req.body;
+      const myResult = await MyReviewCollection.insertOne(myReviews);
+      res.send(myResult);
+    });
+
+    app.delete("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
