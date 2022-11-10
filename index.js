@@ -24,6 +24,8 @@ async function run() {
     const serviceCollection = client
       .db("ilmasDentistry")
       .collection("services");
+
+    const reviewCollection = client.db("ilmasDentistry").collection("reviews");
     app.get("/allServices", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
@@ -42,6 +44,14 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       res.send(service);
+    });
+
+    // create reviews
+
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = reviewCollection.insertOne(review);
+      res.send(result);
     });
   } finally {
   }
